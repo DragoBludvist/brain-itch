@@ -132,7 +132,7 @@ export default function App() {
     <div className="app">
       <header>
         <h1>
-          <span aria-hidden="true">🔁</span> Song Looper
+          <span aria-hidden="true">🔁</span> Brain Itch
         </h1>
         <p>Pick a song, mark the part you love, and hear it on repeat.</p>
       </header>

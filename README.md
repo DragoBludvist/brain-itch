@@ -1,4 +1,4 @@
-# 🔁 Song Looper
+# 🔁 Brain Itch
 
 Loop any part of a song, as many times as you want. Paste a **YouTube** or **Spotify** link, mark a start and end point, choose how many times it should repeat, and press play.
 
