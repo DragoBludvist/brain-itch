@@ -7,6 +7,7 @@ import LoopControls from './components/LoopControls.jsx';
 import { parseSource } from './lib/parseSource.js';
 import { formatTime, roundTenth } from './lib/time.js';
 import { buildShareUrl, readShareState } from './lib/share.js';
+import { copyText } from './lib/copy.js';
 
 const MIN_SECTION = 0.5; // seconds
 const shared = readShareState();
@@ -28,7 +29,10 @@ export default function App() {
 
   const [status, setStatus] = useState('idle'); // idle | looping | done
   const [count, setCount] = useState(0);
-  const [copied, setCopied] = useState(false);
+  const [shareUrl, setShareUrl] = useState('');
+  const [copyState, setCopyState] = useState(null); // copied | shown | manual
+  const shareInputRef = useRef(null);
+  const copiedTimer = useRef(null);
 
   const playerRef = useRef(null);
   // The players report the position ~20x a second; the loop state lives in refs so each
@@ -38,6 +42,12 @@ export default function App() {
   useEffect(() => {
     settings.current = { start, end, loops, forever };
   });
+
+  // A copied link goes stale once the loop changes, so hide it.
+  useEffect(() => {
+    setShareUrl('');
+    setCopyState(null);
+  }, [loadedUrl, start, end, loops, forever]);
 
   // Default the section to the whole song once its length is known.
   useEffect(() => {
@@ -109,12 +119,15 @@ export default function App() {
   async function copyShareLink() {
     const url = buildShareUrl({ src: loadedUrl, start, end, loops, forever });
     window.history.replaceState(null, '', url);
-    try {
-      await navigator.clipboard.writeText(url);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      window.prompt('Copy this link:', url);
+    setShareUrl(url);
+    const ok = await copyText(url);
+    setCopyState(ok ? 'copied' : 'manual');
+    if (ok) {
+      clearTimeout(copiedTimer.current);
+      copiedTimer.current = setTimeout(() => setCopyState((s) => (s === 'copied' ? 'shown' : s)), 2000);
+    } else {
+      // Couldn't copy automatically: select the link so a single Cmd/Ctrl+C (or tap → Copy) does it.
+      requestAnimationFrame(() => shareInputRef.current?.select());
     }
   }
 
@@ -216,9 +229,29 @@ export default function App() {
             onStop={() => stopLoop()}
           />
           {source && !problem && (
-            <button type="button" className="btn ghost share" onClick={copyShareLink}>
-              {copied ? 'Link copied!' : 'Copy a link to this loop'}
-            </button>
+            <div className="share">
+              <button type="button" className="btn ghost" onClick={copyShareLink}>
+                {copyState === 'copied' ? 'Link copied!' : 'Copy a link to this loop'}
+              </button>
+              {shareUrl && (
+                <div className="share-result">
+                  <p className={copyState === 'manual' ? 'error small' : 'hint'} aria-live="polite">
+                    {copyState === 'manual'
+                      ? "Your browser blocked copying. The link below is selected. Press Cmd/Ctrl+C, or tap and hold it, then choose Copy."
+                      : 'Copied! Paste it anywhere to share this loop.'}
+                  </p>
+                  <input
+                    ref={shareInputRef}
+                    type="text"
+                    readOnly
+                    value={shareUrl}
+                    aria-label="Link to this loop"
+                    onFocus={(e) => e.target.select()}
+                    onClick={(e) => e.target.select()}
+                  />
+                </div>
+              )}
+            </div>
           )}
         </section>
       </main>
