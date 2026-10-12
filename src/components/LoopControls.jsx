@@ -1,4 +1,4 @@
-const MAX_LOOPS = 999;
+import { MAX_LOOPS } from '../lib/limits.js';
 
 export default function LoopControls({
   loops,

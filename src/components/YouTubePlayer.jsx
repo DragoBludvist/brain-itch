@@ -93,7 +93,7 @@ export default function YouTubePlayer({ videoId, onReady, onTick, onError, ref }
       clearInterval(timer);
       playerRef.current?.destroy?.();
       playerRef.current = null;
-      host.innerHTML = '';
+      host.replaceChildren();
     };
   }, [videoId]);
 

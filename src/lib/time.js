@@ -1,11 +1,20 @@
-// Accepts "83", "83.5", "1:23", "1:23.5", "1:02:03". Returns seconds, or null if unreadable.
+import { MAX_TIME_INPUT_LENGTH, MAX_TIME_SECONDS } from './limits.js';
+
+export const isValidTime = (sec) =>
+  typeof sec === 'number' && Number.isFinite(sec) && sec >= 0 && sec <= MAX_TIME_SECONDS;
+
+// Accepts "83", "83.5", "1:23", "1:23.5", "1:02:03". Returns seconds, or null if unreadable
+// or outside 0..MAX_TIME_SECONDS.
 export function parseTime(input) {
-  const parts = String(input ?? '').trim().split(':');
+  const text = String(input ?? '').trim();
+  if (text.length > MAX_TIME_INPUT_LENGTH) return null;
+  const parts = text.split(':');
   if (parts.length > 3) return null;
   const last = parts.pop();
   if (!/^(\d+(\.\d*)?|\.\d+)$/.test(last)) return null;
   if (parts.some((p) => !/^\d+$/.test(p))) return null;
-  return parts.reduce((acc, p) => acc * 60 + Number(p), 0) * 60 + Number(last);
+  const seconds = parts.reduce((acc, p) => acc * 60 + Number(p), 0) * 60 + Number(last);
+  return isValidTime(seconds) ? seconds : null;
 }
 
 // 83.4 -> "1:23" (or "1:23.4" when precise).

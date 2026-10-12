@@ -11,18 +11,20 @@ import { buildShareUrl, readShareState } from './lib/share.js';
 const MIN_SECTION = 0.5; // seconds
 const shared = readShareState();
 const sharedSource = shared.src ? parseSource(shared.src) : null;
+// A shared link's song is only trusted once it passes the same checks as a pasted one.
+const sharedOk = !!sharedSource && !sharedSource.error;
 
 export default function App() {
-  const [songUrl, setSongUrl] = useState(shared.src ?? '');
-  const [loadedUrl, setLoadedUrl] = useState(sharedSource && !sharedSource.error ? shared.src : '');
-  const [source, setSource] = useState(sharedSource && !sharedSource.error ? sharedSource : null);
-  const [sourceError, setSourceError] = useState(sharedSource?.error ?? '');
+  const [songUrl, setSongUrl] = useState(sharedOk ? shared.src : '');
+  const [loadedUrl, setLoadedUrl] = useState(sharedOk ? shared.src : '');
+  const [source, setSource] = useState(sharedOk ? sharedSource : null);
+  const [sourceError, setSourceError] = useState(sharedSource && !sharedOk ? 'That shared link has an invalid song in it.' : '');
   const [playerError, setPlayerError] = useState('');
 
   const [duration, setDuration] = useState(0);
   const [current, setCurrent] = useState(0);
-  const [start, setStart] = useState(shared.start ?? 0);
-  const [end, setEnd] = useState(shared.end ?? null);
+  const [start, setStart] = useState(sharedOk ? (shared.start ?? 0) : 0);
+  const [end, setEnd] = useState(sharedOk ? (shared.end ?? null) : null);
   const [loops, setLoops] = useState(shared.loops ?? 5);
   const [forever, setForever] = useState(shared.forever);
 

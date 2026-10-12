@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { formatTime, parseTime } from '../lib/time.js';
+import { MAX_TIME_INPUT_LENGTH } from '../lib/limits.js';
 
 // A text box for times like "1:23.5". Typing is free-form; the value is applied on Enter or blur.
 export default function TimeField({ id, label, value, onChange, onUseCurrent, disabled }) {
@@ -36,6 +37,7 @@ export default function TimeField({ id, label, value, onChange, onUseCurrent, di
           inputMode="decimal"
           placeholder="m:ss"
           value={draft}
+          maxLength={MAX_TIME_INPUT_LENGTH}
           disabled={disabled}
           aria-invalid={invalid}
           onFocus={() => setEditing(true)}

@@ -111,7 +111,7 @@ export default function SpotifyPlayer({ trackId, onReady, onTick, onError, ref }
       clearInterval(timer);
       controllerRef.current?.destroy?.();
       controllerRef.current = null;
-      host.innerHTML = '';
+      host.replaceChildren();
     };
   }, [trackId]);
 

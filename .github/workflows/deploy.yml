@@ -19,11 +19,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v5
         with:
           node-version: 24
           cache: npm
-      - run: npm ci
+      - run: npm ci --ignore-scripts
+      # Refuse to deploy if any dependency has a known high or critical vulnerability.
+      - run: npm audit --audit-level=high
+      - run: npm test
       - run: npm run build
       - uses: actions/upload-pages-artifact@v4
         with:

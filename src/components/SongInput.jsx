@@ -1,3 +1,5 @@
+import { MAX_URL_LENGTH } from '../lib/limits.js';
+
 export default function SongInput({ value, onChange, onSubmit, error }) {
   return (
     <form
@@ -17,6 +19,7 @@ export default function SongInput({ value, onChange, onSubmit, error }) {
           inputMode="url"
           placeholder="Paste a YouTube or Spotify link"
           value={value}
+          maxLength={MAX_URL_LENGTH}
           onChange={(e) => onChange(e.target.value)}
           autoComplete="off"
           spellCheck={false}
