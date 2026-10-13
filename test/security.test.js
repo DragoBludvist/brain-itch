@@ -35,12 +35,23 @@ describe('parseSource: valid links still work', () => {
     [`https://m.youtube.com/watch?v=${YT_ID}&t=30`, 'youtube', YT_ID],
     [`https://music.youtube.com/watch?v=${YT_ID}`, 'youtube', YT_ID],
     [`https://www.youtube-nocookie.com/embed/${YT_ID}`, 'youtube', YT_ID],
-    [`https://open.spotify.com/track/${SP_ID}?si=xyz`, 'spotify', SP_ID],
-    [`https://open.spotify.com/intl-de/track/${SP_ID}`, 'spotify', SP_ID],
-    [`spotify:track:${SP_ID}`, 'spotify', SP_ID],
     [`  https://YOUTUBE.com/watch?v=${YT_ID}  `, 'youtube', YT_ID],
   ]) {
     test(input.trim(), () => assert.deepEqual(parseSource(input), { kind, id }));
+  }
+});
+
+describe('parseSource: Spotify links are not supported', () => {
+  for (const input of [
+    `https://open.spotify.com/track/${SP_ID}?si=xyz`,
+    `https://open.spotify.com/intl-de/track/${SP_ID}`,
+    `open.spotify.com/track/${SP_ID}`,
+    `spotify:track:${SP_ID}`,
+    `SPOTIFY:track:${SP_ID}`,
+    `https://open.spotify.com/playlist/${SP_ID}`,
+    'https://spotify.link/abc123',
+  ]) {
+    test(input, () => assert.match(rejected(input).error, /Spotify links are not supported/));
   }
 });
 
@@ -126,16 +137,15 @@ describe('parseSource: HTML / script injection', () => {
       `https://open.spotify.com/track/${SP_ID}/<b>`,
     ]) {
       const r = parseSource(input);
-      if (!r.error) assert.match(r.id, /^[A-Za-z0-9_-]{11}$|^[A-Za-z0-9]{22}$/);
+      if (!r.error) assert.match(r.id, /^[A-Za-z0-9_-]{11}$/);
     }
   });
 
   test('wrong-length IDs are rejected', () => {
     rejected(`https://www.youtube.com/watch?v=${YT_ID}x`);
     rejected(`https://www.youtube.com/watch?v=${YT_ID.slice(1)}`);
-    rejected(`https://open.spotify.com/track/${SP_ID}x`);
-    rejected(`spotify:track:${SP_ID}x`);
-    rejected(`spotify:track:${SP_ID.slice(0, 21)}_`);
+    rejected(`https://youtu.be/${YT_ID}x`);
+    rejected(`https://www.youtube.com/shorts/${YT_ID.slice(0, 10)}`);
   });
 
   test('error messages never echo the input', () => {
@@ -171,12 +181,6 @@ describe('parseSource: oversized and odd input', () => {
   for (const input of [undefined, null, '', '   ', 42, {}, [], { toString: () => 'javascript:alert(1)' }]) {
     test(`non-link value ${JSON.stringify(input) ?? String(input)}`, () => rejected(input));
   }
-
-  test('a non-song Spotify link is rejected', () => {
-    rejected(`https://open.spotify.com/playlist/${SP_ID}`);
-    rejected(`https://open.spotify.com/album/${SP_ID}`);
-    rejected('https://spotify.link/abc123');
-  });
 });
 
 describe('parseTime: malformed values', () => {

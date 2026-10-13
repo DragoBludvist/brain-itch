@@ -1,10 +1,10 @@
 # 🔁 Brain Itch
 
-Loop any part of a song, as many times as you want. Paste a **YouTube** or **Spotify** link, mark a start and end point, choose how many times it should repeat, and press play.
+Loop any part of a song, as many times as you want. Paste a **YouTube** link, mark a start and end point, choose how many times it should repeat, and press play.
 
 ## How to use it
 
-1. **Song**: paste a YouTube link (`youtube.com/watch?v=…`, `youtu.be/…`, Shorts, YouTube Music) or a Spotify song link (`open.spotify.com/track/…`), then press **Load**.
+1. **Song**: paste a YouTube link (`youtube.com/watch?v=…`, `youtu.be/…`, Shorts, YouTube Music), then press **Load**.
 2. **Start point → end point**: drag the green handles on the timeline, type times like `1:23` or `1:23.5`, or press **Use now** while the song plays to grab the current spot. The arrow keys nudge a focused handle by 0.5s (hold Shift for 5s).
 3. **Loops**: pick how many times the part should play, or tick **Loop forever**, then press **Start looping**.
 
@@ -12,9 +12,9 @@ Loop any part of a song, as many times as you want. Paste a **YouTube** or **Spo
 
 ## Good to know
 
-- **Spotify** plays full songs only when you're logged in to Spotify in the same browser. Logged out, Spotify's player gives a 30-second preview. No Spotify Premium or developer account is needed.
-- **YouTube**: some videos (often official music videos) block playing on other websites. The app says so when that happens. Try a different upload of the song.
-- Loop points are accurate to roughly a tenth of a second. Spotify's player reports its position less often than YouTube's, so its loops can be slightly less precise.
+- Some videos (often official music videos) block playing on other websites. The app says so when that happens. Try a different upload of the song.
+- Loop points are accurate to roughly a tenth of a second.
+- Spotify links aren't supported: Spotify's embedded player only plays 30-second previews on other websites.
 
 ## Host it on your own GitHub (free)
 
@@ -41,21 +41,19 @@ Then open the address it prints (usually http://localhost:5173).
 ## How it's built
 
 - [React](https://react.dev) + [Vite](https://vite.dev)
-- [YouTube IFrame Player API](https://developers.google.com/youtube/iframe_api_reference) and the [Spotify Embed iFrame API](https://developer.spotify.com/documentation/embeds/references/iframe-api) to control playback. Neither needs API keys.
+- [YouTube IFrame Player API](https://developers.google.com/youtube/iframe_api_reference) to control playback. It doesn't need an API key.
 
 ```
 src/
   App.jsx                  page layout + the looping logic
   components/
-    Player.jsx             picks the YouTube or Spotify player
     YouTubePlayer.jsx      wraps the YouTube player
-    SpotifyPlayer.jsx      wraps the Spotify embed
     Timeline.jsx           draggable start/end handles
     TimeField.jsx          "1:23.5"-style time boxes
     LoopControls.jsx       loop count, start/stop, progress
     SongInput.jsx          link box
   lib/
-    parseSource.js         turns a pasted link into a YouTube/Spotify ID
+    parseSource.js         turns a pasted link into a YouTube video ID
     time.js                time parsing/formatting
     share.js               shareable loop links
 ```

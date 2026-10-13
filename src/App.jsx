@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import SongInput from './components/SongInput.jsx';
-import Player from './components/Player.jsx';
+import YouTubePlayer from './components/YouTubePlayer.jsx';
 import Timeline from './components/Timeline.jsx';
 import TimeField from './components/TimeField.jsx';
 import LoopControls from './components/LoopControls.jsx';
@@ -33,7 +33,7 @@ export default function App() {
   const [copied, setCopied] = useState(false);
 
   const playerRef = useRef(null);
-  // The players report the position ~20x a second; the loop state lives in refs so each
+  // The player reports the position ~20x a second; the loop state lives in refs so each
   // report sees the latest settings without waiting for a re-render.
   const loop = useRef({ active: false, count: 0, returningSince: 0 });
   const settings = useRef({ start, end, loops, forever });
@@ -147,13 +147,15 @@ export default function App() {
           <SongInput value={songUrl} onChange={setSongUrl} onSubmit={loadSong} error={sourceError} />
           {source && (
             <div className="player-wrap">
-              <Player source={source} ref={playerRef} onTick={handleTick} onReady={(d) => d && setDuration(d)} onError={setPlayerError} />
+              <YouTubePlayer
+                key={source.id}
+                ref={playerRef}
+                videoId={source.id}
+                onTick={handleTick}
+                onReady={(d) => d && setDuration(d)}
+                onError={setPlayerError}
+              />
               {playerError && <p className="error">{playerError}</p>}
-              {source.kind === 'spotify' && (
-                <p className="hint">
-                  Spotify plays the full song only if you're logged in to Spotify in this browser. Otherwise it's a 30-second preview.
-                </p>
-              )}
             </div>
           )}
         </section>
@@ -225,7 +227,7 @@ export default function App() {
         </section>
       </main>
 
-      <footer>Works with YouTube and Spotify links. Nothing is stored. Your loops live in the link.</footer>
+      <footer>Works with YouTube links. Nothing is stored. Your loops live in the link.</footer>
     </div>
   );
 }

@@ -17,7 +17,7 @@ export default function SongInput({ value, onChange, onSubmit, error }) {
           id="song-url"
           type="text"
           inputMode="url"
-          placeholder="Paste a YouTube or Spotify link"
+          placeholder="Paste a YouTube link"
           value={value}
           maxLength={MAX_URL_LENGTH}
           onChange={(e) => onChange(e.target.value)}
@@ -31,7 +31,7 @@ export default function SongInput({ value, onChange, onSubmit, error }) {
       {error ? (
         <p className="error">{error}</p>
       ) : (
-        <p className="hint">Like youtube.com/watch?v=… or open.spotify.com/track/…</p>
+        <p className="hint">Like youtube.com/watch?v=… or youtu.be/…</p>
       )}
     </form>
   );

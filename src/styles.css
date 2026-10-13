@@ -221,11 +221,6 @@ input[aria-invalid='true'] {
   aspect-ratio: 16 / 9;
 }
 
-.player-frame.spotify {
-  height: 152px;
-  background: transparent;
-}
-
 .player-frame iframe {
   display: block;
   width: 100%;
